@@ -1,0 +1,11 @@
+<header>
+    <button class="large button radius back" ng:click="back()">Back</button>
+    <button class="large button radius next" show="answer.isValid" ng:click="next()" >Next</button>
+    <h1>{{questionnaire.title}}</h1>
+</header>
+<h2>{{question.title}}</h2>
+<p class="description" ng:bind-html="question.description"></p>
+<div class="question">
+    <ng:include src='questionTemplate' class="{{question.type}}"/>
+</div>
+<pre>{{answer|json}}</pre>

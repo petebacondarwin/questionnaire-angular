@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:ng="http://angularjs.org/" ng:app="QuestionnaireApp">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
+  <title>Clinical Questionnaire App</title>
+  <link rel="stylesheet" href="/lib/foundation/stylesheets/foundation.css">
+  <link rel="stylesheet" href="/lib/jquery.ui/css/redmond/jquery-ui-1.8.18.css">
+  <link rel="stylesheet" href="/css/app.css"/>
+  <!--[if lt IE 9]>
+    <link rel="stylesheet" href="/lib/foundation/stylesheets/ie.css">
+  <![endif]-->
+  <script type="text/javascript" src="/lib/head.load.min.js"></script>
+  <script type="text/javascript" src="/js/load.js"></script>
+</head>
+<body>
+  <div class="container">
+   
+    <div class="row">
+      <section class="twelve columns" class="page">
+        <ng:view />
+      </section>
+    </div>
+  
+  </div>
+</body>
+</html>

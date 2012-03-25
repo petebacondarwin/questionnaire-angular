@@ -1,0 +1,68 @@
+{
+  "_id": "osis",
+  "type": "questionnaire",
+  "title": "Oxford Shoulder Instability Score",
+  "description": "Problems with your shoulder...",
+  "questions":
+  [
+    {
+      "name": "patient-id",
+      "type": "identity",
+      "title": "Patient Identification",
+      "description": "Please identify yourself with the following information."
+    },  
+    {
+      "name": "which-shoulder",
+      "type": "choice",
+      "title": "Which Shoulder?",
+      "description": "Please select with which shoulder you have a problem.",
+      "choices":
+      [
+        { "name": "left", "title": "Left", "value": "left" },
+        { "name": "right", "title": "Right", "value": "right" }
+      ]
+    },
+    {
+      "name": "dislocations",
+      "type": "choice",
+      "title": "Dislocations in the last 6 months",
+      "description": "<strong>During the last 6 months ...</strong><br/>how many times has your shoulder slipped out of joint (or dislocated)?",
+      "choices":
+      [
+        { "name": "never", "title": "Not at all<br/>in 6 months", "value": 1 },
+        { "name": "occasionally", "title": "1 or 2 times<br/>in 6 months", "value": 2 },
+        { "name": "monthly", "title": "1 or 2 times<br/>per month", "value": 3 },
+        { "name": "weekly", "title": "1 or 2 times<br/>per week", "value": 3 },
+        { "name": "daily", "title": "More often than<br/>1 or 2 times per week", "value": 4 }
+      ]
+    },
+    {
+      "name": "difficulty-with-clothing",
+      "type": "choice",
+      "title": "Difficulty putting on clothing",
+      "description": "<strong>During the last 3 months...</strong><br/>have you had any trouble have you had any trouble (or worry) with putting on a t-shirt or pullover because of your shoulder?",
+      "choices":
+      [
+        { "name": "no-trouble", "title": "No trouble at all", "value": 1 },
+        { "name": "very-little-trouble", "title": "Very little trouble", "value": 2 },
+        { "name": "moderate-trouble", "title": "Moderate trouble", "value": 3 },
+        { "name": "extremely-difficulty", "title": "Extremely difficult", "value": 4 },
+        { "name": "impossible", "title": "Impossible to do", "value": 5 }
+      ]
+    },
+    {
+      "name": "pain",
+      "type": "choice",
+      "title": "Amount of Pain",
+      "description": "During the last 3 months...how would you describe the worst pain you have had from your shoulder?",
+      "choices":
+      [
+        { "name": "none", "title": "None", "value": 1 },
+        { "name": "mild-ache", "title": "Mild Ache", "value": 2 },
+        { "name": "moderate", "title": "Moderate", "value": 3 },
+        { "name": "severe", "title": "Severe", "value": 4 },
+        { "name": "unbearable", "title": "Unbearable", "value": 5 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+<ul ng:controller="Questionnaire.ChoiceQuestionController" >
+    <li ng:repeat="choice in question.choices">
+        <button class="large button radius" ng:class="choiceCSSClass(choice)" ng:click="selectChoice(choice)"ng:bind-html="choice.title"></button>
+    </li>
+</ul>

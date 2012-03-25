@@ -1,0 +1,10 @@
+<form name="identityForm" class="nice" ng:controller="Questionnaire.IdentityQuestionController">
+<div class="form-field">
+    <label for="nhs">NHS Number:</label>
+    <ui:masked id="nhs" ui:value="answer.nhs" ui:isvalid="answer.nhsIsValid" ui:mask='"999-999-9999"' placeholder="123-456-7890" />
+</div>
+<div class="form-field">
+    <label for="dob">Date of Birth:</label>
+    <ui:Date id="dob" ng:model="answer.dob" ui:isvalid='answer.dobIsValid'/>
+</div>
+</form>

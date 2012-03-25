@@ -1,0 +1,68 @@
+{
+  "_id": "oss",
+  "type": "questionnaire",
+  "title": "Oxford Knee Score",
+  "description": "Problems with your knee...",
+  "questions":
+  [
+    {
+      "name": "patient-id",
+      "type": "identity",
+      "title": "Patient Identification",
+      "description": "Please identify yourself with the following information."
+    },  
+    {
+      "name": "which-knee",
+      "type": "choice",
+      "title": "Which Knee?",
+      "description": "Please select with which shoulder you have a problem.",
+      "choices":
+      [
+        { "name": "left", "title": "Left", "value": "left" },
+        { "name": "right", "title": "Right", "value": "right" }
+      ]
+    },
+    {
+      "name": "pain",
+      "type": "choice",
+      "title": "Amount of Pain",
+      "description": "<strong>During the past 4 weeks...</strong><br/>how would you describe the pain you usually have had from your knee?",
+      "choices":
+      [
+        { "name": "none", "title": "None", "value": 1 },
+        { "name": "mild", "title": "Mild", "value": 2 },
+        { "name": "moderate", "title": "Moderate", "value": 3 },
+        { "name": "severe", "title": "Severe", "value": 4 },
+        { "name": "unbearable", "title": "Unbearable", "value": 5 }
+      ]
+    },
+    {
+      "name": "difficulty-washing",
+      "type": "choice",
+      "title": "Difficulty washing",
+      "description": "<strong>During the past 4 weeks...</strong><br/>have you had any trouble with washing and drying yourself (all over) because of your knee?",
+      "choices":
+      [
+        { "name": "no-trouble", "title": "No trouble at all", "value": 1 },
+        { "name": "very-little-trouble", "title": "Very little trouble", "value": 2 },
+        { "name": "moderate-trouble", "title": "Moderate trouble", "value": 3 },
+        { "name": "extremely-difficulty", "title": "Extremely difficult", "value": 4 },
+        { "name": "impossible", "title": "Impossible to do", "value": 5 }
+      ]
+    },
+    {
+      "name": "difficulty-getting-around",
+      "type": "choice",
+      "title": "Difficulty getting around",
+      "description": "<strong>During the past 4 weeks...</strong><br/>Have you had any trouble getting in and out of a car or using public transport because of your knee?<br/>(whichever you tend to use)",
+      "choices":
+      [
+        { "name": "no-trouble", "title": "No trouble at all", "value": 1 },
+        { "name": "very-little-trouble", "title": "Very little trouble", "value": 2 },
+        { "name": "moderate-trouble", "title": "Moderate trouble", "value": 3 },
+        { "name": "extremely-difficulty", "title": "Extremely difficult", "value": 4 },
+        { "name": "impossible", "title": "Impossible to do", "value": 5 }
+      ]
+    }
+  ]
+}

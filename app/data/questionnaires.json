@@ -1,0 +1,9 @@
+{
+    "title": "Shoulder Questionnaire App",
+    "description": "Please select a questionnaire to fill in.",
+    "questionnaires":
+        [
+            { "name": "oks", "title": "Oxford Knee Score", "description": "Problems with your knee." },
+            { "name": "osis", "title": "Oxford Shoulder Instability Score", "description": "Problems with your shoulder." }
+        ]
+}

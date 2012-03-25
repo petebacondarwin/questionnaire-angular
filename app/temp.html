@@ -1,0 +1,31 @@
+
+      <section id="start" class="page" ng:controller="Questionnaire.PageController" ng:show="isCurrent()">
+         <header>
+            <h1>{{currentQuestionnaire.title}}</h1>
+            <a class="button" ng:href="#{{currentQuestionnaire.questions[0].name}}">Start</a>
+         </header>
+         <p class="info">{{currentQuestionnaire.description}}</p>
+         <fieldset>
+            <label for="nhs_number">NHS Number:</label>
+            <input type="text" name="submission.nhs_number" value="" ng:required/>
+            <label for="dob">Date of Birth (dd/mm/yyyy):</label>
+            <input type="text" name="submission.dob" value="" ng:required/>
+            
+         </fieldset>
+      </section>
+
+
+
+
+
+
+
+      <section id="summary" class="page" ng:controller="Questionnaire.PageController" ng:show="isCurrent()">
+         <header>
+            <a href="#" class="back">Back</a>
+            <h1>Summary</h1>
+         </header>
+         <ul>
+            <li ng:repeat="response in responses"><a ng:href="{{questionLink(response.question)}}">{{response.question.title}} - {{response.choice.title}}</a></li>
+         </ul>
+      </section>
