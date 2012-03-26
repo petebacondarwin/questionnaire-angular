@@ -1,19 +1,9 @@
 # A service that provides access to the questionnaire data
 class QuestionnaireService
-  @$inject: ['$http', '$rootScope', '$q', '$log']
-  constructor: (@$http, @$rootScope, @$q, @$log)->
+  @$inject: ['$http', '$rootScope', '$q', '$routeParams', '$log']
+  constructor: (@$http, @$rootScope, @$q, @$routeParams, @$log)->
     @$log.log "QuestionnaireService: Initializing"
-
-    # Listen for changes on the route to the current questionnaire and question 
-    @$rootScope.$on '$afterRouteChange', (event, current, previous)=>
-      @currentQuestionnaireId = current.params.questionnaire ? ''
-      @currentQuestionIndex = current.params.questionIndex ? ''
-
-    # If the questionnaire changes then clear the response
-    @$rootScope.$watch(
-      () => @currentQuestionnaireId
-    ,
-      ()=> @currentResponse = null )
+    @questionnairePromises ?= []
 
   # Get the promise of a list of questionnaires
   list: ()->
@@ -24,41 +14,39 @@ class QuestionnaireService
         @$http.get('data/questionnaires.json')
           .success (questionnaires)=> @$log.log "QuestionnaireService: List Downloaded Successfully"
 
+  currentQuestionnaireId: ()=>
+    @$routeParams.questionnaire ? ''
+
+  currentQuestionIndex: ()=>
+    index = @$routeParams.questionIndex
+    index = Number(index) if index?
+    index = null if isNaN(index)
+    return index
+
   # Get the promise of the current questionnaire
-  currentQuestionnaire: ()->
-    @$log.log "QuestionnaireService: Current Questionnaire Requested"
-    if @currentQuestionnaireId isnt ''
-      @$log.log "QuestionnaireService: Questionnaire '#{@currentQuestionnaireId}' Requested"
-      @questionnairePromises ?= []
-      @questionnairePromises[@currentQuestionnaireId] ?=
-        do ()=>
-          @$log.log "QuestionnaireService: Questionnaire '#{@currentQuestionnaireId}' Downloading"
-          @$http.get("data/questionnaires/#{@currentQuestionnaireId}.json")
-            .success (questionnaire)=> @$log.log "QuestionnaireService: Questionnaire '#{@currentQuestionnaireId}' Downloaded"
-    else
+  currentQuestionnaire: ()=>
+    id = @currentQuestionnaireId()
+    @getQuestionnaire(id)
+
+  getQuestionnaire: (id)=>
+    @$log.log "QuestionnaireService: Questionnaire '#{id}' Requested"
+
+    if id is ''
       @$log.log "QuestionnaireService: No Current Questionnaire"
       dummy = @$q.defer()
       dummy.reject('Empty questionnaire id')
-      dummy.promise
+      return dummy.promise
 
-  # Get the promise of a response to the current questionnaire
-  currentResponse: ()->
-    @$log.log "QuestionnaireService: Current Response Requested"
-    @currentQuestionnaire().then (questionnaire)->
-      @currentResponse ?= newResponse(questionnaire)
-
-  # Build a new response from the supplied questionnaire
-  newResponse: (questionnaire)=>
-    now = new Date()
-    response =
-      questionnaire: questionnaire._id
-      date: now.toDateString()
-      time: now.getTime()
-      type: 'response'
-      answers: questionnaire.questions.map (question, index)->
-        question: question      # the question being answered
-        questionIndex: index+1  # questionIndex is 1-based
-        isValid: false          # initially all answers are invalid
+    if @questionnairePromises[id]?
+      @$log.log "QuestionnaireService: Questionnaire '#{id}' From cache." 
+    else
+      @$log.log "QuestionnaireService: Questionnaire '#{id}' Downloading"
+      @questionnairePromises[id] = 
+        @$http.get("data/questionnaires/#{id}.json")
+          .then (response)=>
+            @$log.log "QuestionnaireService: Questionnaire '#{id}' Downloaded"
+            response.data
+    @questionnairePromises[id]
 
 
 # Declare this service in an angular module

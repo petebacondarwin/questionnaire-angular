@@ -1,11 +1,13 @@
 <header>
-    <button class="large button radius back" ng:click="back()">Back</button>
-    <button class="large button radius next" show="answer.isValid" ng:click="next()" >Next</button>
     <h1>{{questionnaire.title}}</h1>
+    <button class="large button radius back" ng-click="home()">Cancel</button>
+    <button class="large button radius back" ng-click="back()" ng-show="notFirst()">Back</button>
+    <button class="large button radius next" ng-show="showNext()" ng-click="next()" >Next</button>
+    <button class="large button radius next" ng-show="allValid()" ng-click="summary()" >Summary</button>
 </header>
-<h2>{{question.title}}</h2>
-<p class="description" ng:bind-html="question.description"></p>
+<h2>Question {{questionIndex}} of {{numQuestions}}<br/>{{question.title}}</h2>
+<p class="description" ng-bind-html="question.description"></p>
 <div class="question">
-    <ng:include src='questionTemplate' class="{{question.type}}"/>
+    <ng:include src='questionTemplate(question.type)' class="{{question.type}}"/>
 </div>
 <pre>{{answer|json}}</pre>

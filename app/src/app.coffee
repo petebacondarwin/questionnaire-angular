@@ -14,16 +14,13 @@ angular.module('AppConfig',[])
 
     $routeProvider.when('/:questionnaire',
       template: '/templates/questionnaire-detail.html'
-      controller: 'Questionnaire.QuestionnaireController'
     )
 
     $routeProvider.when('/:questionnaire/summary',
       template: '/templates/questionnaire-summary.html',
-      controller: 'Questionnaire.QuestionnaireController'
     )
 
     $routeProvider.when('/:questionnaire/:questionIndex',
       template: '/templates/question.html'
-      controller: 'Questionnaire.QuestionController'
     )
   ])

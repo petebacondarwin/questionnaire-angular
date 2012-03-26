@@ -10,16 +10,13 @@
         controller: 'Questionnaire.QuestionnaireListController'
       });
       $routeProvider.when('/:questionnaire', {
-        template: '/templates/questionnaire-detail.html',
-        controller: 'Questionnaire.QuestionnaireController'
+        template: '/templates/questionnaire-detail.html'
       });
       $routeProvider.when('/:questionnaire/summary', {
-        template: '/templates/questionnaire-summary.html',
-        controller: 'Questionnaire.QuestionnaireController'
+        template: '/templates/questionnaire-summary.html'
       });
       return $routeProvider.when('/:questionnaire/:questionIndex', {
-        template: '/templates/question.html',
-        controller: 'Questionnaire.QuestionController'
+        template: '/templates/question.html'
       });
     }
   ]);

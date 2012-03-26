@@ -1,83 +1,106 @@
 'use strict'
 @Questionnaire ?= {}
 
+class @Questionnaire.AppController
+  @$inject: ['$scope','QuestionnaireService', '$location', '$log']
+  constructor: (@$scope, @QuestionnaireService, @$location, @$log)->
+    @$scope.$on ('$afterRouteChange'), @onRouteChanged
+
+  # Rewire the scope when the route changes
+  onRouteChanged: ()=>
+    @$log.log "Route has changed - getting questionnaire"
+
+    @$scope.questionnaireId = @QuestionnaireService.currentQuestionnaireId()
+    @$scope.questionIndex = @QuestionnaireService.currentQuestionIndex()
+
+    if @$scope.questionnaireId?
+      # Wait for the questionnaire to arrive ...
+      @QuestionnaireService.getQuestionnaire(@$scope.questionnaireId).then (questionnaire)=>
+        # ... then update the scope
+        @updateScopeForQuestionnaire(questionnaire)
+
+  updateScopeForQuestionnaire: (questionnaire)=>
+    # Ensure that the scope has a reference to the current questionnaire
+    @$scope.questionnaire = questionnaire
+    @$scope.numQuestions = questionnaire.questions.length
+
+    # General navigation helpers
+    @$scope.questionnaireUrl = "#{@$scope.questionnaireId}"
+    @$scope.home = ()=> @$location.path('/')
+    @$scope.start = ()=> @$location.path("#{@$scope.questionnaireUrl}/1")
+
+    # Create a response if we don't have one already
+    if @$scope.response?.questionnaire isnt @$scope.questionnaire._id
+      @$scope.response = @createResponse(questionnaire)
+
+    # Are we on a question?
+    if @$scope.questionIndex?
+      # Redirect if the questionIndex is invalid
+      @$location.path('/') if not (@$scope.questionIndex? and 1 <= @$scope.questionIndex <= @$scope.numQuestions)
+      # Ensure that the scope has a reference to the current question
+      @$scope.question = questionnaire.questions[@$scope.questionIndex-1] # questionIndex is 1-based
+      # Ensure that the scope has a reference to the current answer
+      @$scope.answer = @$scope.response.answers[@$scope.questionIndex-1]
+
+      @$scope.questionTemplate = (questionType)-> "/templates/questions/#{questionType}.html"
+
+      # Question specific navigation helpers
+      @$scope.notFirst = ()=> @$scope.questionIndex > 1
+      @$scope.notLast = ()=> @$scope.questionIndex < @$scope.numQuestions
+      @$scope.summary = ()=> @$location.path(@$scope.questionnaireUrl + '/summary')
+      @$scope.first = ()=> @$location.path(@$scope.questionnaireUrl)
+      @$scope.back = ()=> @$location.path(@$scope.questionnaireUrl + "/#{@$scope.questionIndex - 1}")
+      @$scope.next = ()=> @$location.path("#{@$scope.questionnaireUrl}/#{@$scope.questionIndex + 1}")
+      @$scope.last = ()=> @$location.path(@$scope.questionnaireUrl + "/#{@$scope.numQuestions}")
+      @$scope.showNext = ()=> @$scope.isValid() and @$scope.notLast()
+      # Validity helpers
+      @$scope.isValid = ()=> @$scope.answer?.isValid
+      @$scope.isInvalid = ()=> not @$scope.isValid()
+      @$scope.allValid = ()=> @$scope.response?.answers?.every (answer)-> answer.isValid
+
+  # Build a new response from the supplied questionnaire
+  createResponse: (questionnaire)=>
+    @$log.log "AppController: Creating a new response for questionnaire: #{questionnaire._id}"
+    now = new Date()
+    response =
+      questionnaire: questionnaire._id
+      date: now.toDateString()
+      time: now.getTime()
+      type: 'response'
+      answers: questionnaire.questions.map (question, index)->
+        question: question      # the question being answered
+        questionIndex: index+1  # questionIndex is 1-based
+        isValid: false          # initially all answers are invalid
+
+
 # Controls the display of the list of questionnaires
 class @Questionnaire.QuestionnaireListController
   @$inject: ['$scope', 'QuestionnaireService', '$log']
   constructor: (@$scope, @QuestionnaireService, @$log)->
     @QuestionnaireService.list().success (list)=>
       angular.extend(@$scope, list) # Merge list into scope
+
     
-class @Questionnaire.QuestionnaireController
-  @$inject: ['$scope','QuestionnaireService', '$log']
-  constructor: (@$scope, @QuestionnaireService, @$log)->
-    @$scope.home = @home
-    @$scope.start = @start
-    @QuestionnaireService.currentQuestionnaire().success (questionnaire)=>
-      @$scope.questionnaire = questionnaire
-
-  home: ()=>
-    @$location.path('/')
-  start: ()=>
-    @$location.path("/#{@$scope.questionnaireId}/1")
-
-
-# Controls the display of an individual question in a questionnaire
-class @Questionnaire.QuestionController
-  @$inject: ['$scope', '$routeParams', '$location', 'QuestionnaireService', '$log']
-  constructor: (@$scope, @$routeParams, @$location, @QuestionnaireService, @$log)->
-    @$scope.questionnaireId = $routeParams.questionnaire ?  ''
-    questionIndex = Number($routeParams.questionIndex)
-    if questionIndex? and not isNaN(questionIndex)
-      @$scope.questionIndex = questionIndex
-    else
-      @$location.redirectTo = '/'
-
-    @$scope.isValid = @isValid
-    $scope.$watch("questionIndex", @onQuestionChanged)
-  
-  onQuestionChanged: ()=>
-    unless isNaN(@$scope.questionIndex)
-      @QuestionnaireService.get(@$scope.questionnaireId)
-      .success((questionnaire)=>
-        questions = questionnaire.questions
-        index = @$scope.questionIndex-1 # questionIndex is 1-based
-        question = questions[index]
-        @$scope.question = question
-        @$scope.answer = @$scope.response.answers[index]
-        @$scope.questionTemplate = "/templates/questions/#{question.type}.html"
-        @$scope.next = ()=>
-          if index < questions.length-1
-            @$location.path("/#{@$scope.questionnaireId}/#{index+2}")
-          else
-            @$location.path("/#{@$scope.questionnaireId}/summary")
-        @$scope.back = ()=> @$location.path("/#{@$scope.questionnaireId}/#{index}")
-      )
-
-  isValid: ()=>
-    @$scope.answer?.isValid
 
 class @Questionnaire.IdentityQuestionController
   @$inject: ['$scope']
   constructor: (@$scope)->
     @$scope.$watch 'answer.nhsIsValid && answer.dobIsValid', (value)=>
-      @$scope.answer.isValid = value
+      @$scope.answer.isValid = true  # !!! TODO Fix this!!!
       @$scope.answer.description = "#{@$scope.answer.nhs} : #{@$scope.answer.dob}"
 
 # Controls the behaviour of a multichoice question
 class @Questionnaire.ChoiceQuestionController
   @$inject: ['$scope']
   constructor: (@$scope)->
-    @$scope.choiceCSSClass = @choiceCSSClass
-    @$scope.selectChoice = @selectChoice
+    
+    @$scope.choiceCSSClass = (choice)=>
+      if @$scope.answer?.choice is choice 
+        'blue'
+      else
+        'white'
 
-  choiceCSSClass: (choice)=>
-    if @$scope.answer?.choice is choice 
-      'blue'
-    else
-      'white'
-
-  selectChoice: (choice)=>
-    @$scope.answer.choice = choice
-    @$scope.answer.isValid = choice?
-    @$scope.answer.description = choice.title
+    @$scope.selectChoice = (choice)=>
+      @$scope.answer.choice = choice
+      @$scope.answer.isValid = choice?
+      @$scope.answer.description = choice.title
