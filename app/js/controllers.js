@@ -143,8 +143,19 @@
     function IdentityQuestionController($scope) {
       var _this = this;
       this.$scope = $scope;
-      this.$scope.$watch('answer.nhsIsValid && answer.dobIsValid', function(value) {
-        _this.$scope.answer.isValid = true;
+      this.$scope.dateOptions = {
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy'
+      };
+      this.$scope.$watch((function() {
+        return "" + _this.$scope.identityForm.$valid;
+      }), function(value) {
+        return _this.$scope.answer.isValid = $scope.identityForm.$valid;
+      });
+      this.$scope.$watch((function() {
+        return "" + _this.$scope.answer.nhs + " : " + _this.$scope.answer.dob;
+      }), function(value) {
         return _this.$scope.answer.description = "" + _this.$scope.answer.nhs + " : " + _this.$scope.answer.dob;
       });
     }

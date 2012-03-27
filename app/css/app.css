@@ -20,3 +20,7 @@ pre {
     font-family: Courier New, sans-serif;
     clear: left;
 }
+
+.ui-datepicker select {
+	display: inline-block;
+}

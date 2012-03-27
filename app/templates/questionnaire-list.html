@@ -1,9 +1,9 @@
 <header>
   <h1>{{title}}</h1>
-  <p ng:bind-html="description"></p>
+  <p ng-bind-html="description"></p>
 </header>
 <ul>
-  <li ng:repeat="questionnaire in questionnaires" >
-     <a title="{{questionnaire.description}}" class="large button radius" ng:href="#/{{questionnaire.name}}" ng:bind-html="questionnaire.title"></a>
+  <li ng-repeat="questionnaire in questionnaires" >
+     <a title="{{questionnaire.description}}" class="large button radius" ng-href="#/{{questionnaire.name}}" ng-bind-html="questionnaire.title"></a>
   </li>
 </ul>

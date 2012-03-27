@@ -8,6 +8,6 @@
 <h2>Question {{questionIndex}} of {{numQuestions}}<br/>{{question.title}}</h2>
 <p class="description" ng-bind-html="question.description"></p>
 <div class="question">
-    <ng:include src='questionTemplate(question.type)' class="{{question.type}}"/>
+    <ng-include src='questionTemplate(question.type)' class="{{question.type}}"/>
 </div>
 <pre>{{answer|json}}</pre>

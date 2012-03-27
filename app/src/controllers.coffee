@@ -85,8 +85,17 @@ class @Questionnaire.QuestionnaireListController
 class @Questionnaire.IdentityQuestionController
   @$inject: ['$scope']
   constructor: (@$scope)->
-    @$scope.$watch 'answer.nhsIsValid && answer.dobIsValid', (value)=>
-      @$scope.answer.isValid = true  # !!! TODO Fix this!!!
+    @$scope.dateOptions =
+      changeMonth: true
+      changeYear: true
+      dateFormat: 'dd/mm/yy'
+
+    # Watch the identity form and update the answer validity accordingly
+    @$scope.$watch (()=> "#{@$scope.identityForm.$valid}"), (value)=>
+      @$scope.answer.isValid = $scope.identityForm.$valid
+
+    # Watch the identity form and update the answer description accordingly
+    @$scope.$watch (()=>"#{@$scope.answer.nhs} : #{@$scope.answer.dob}"), (value)=>
       @$scope.answer.description = "#{@$scope.answer.nhs} : #{@$scope.answer.dob}"
 
 # Controls the behaviour of a multichoice question

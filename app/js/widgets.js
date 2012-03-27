@@ -4,60 +4,49 @@
 
   Widgets = angular.module('WidgetModule', []);
 
-  Widgets.directive('uiMasked', [
-    '$parse', function($parse) {
-      return {
-        replace: true,
-        template: "<input type='text'></input>",
-        link: function($scope, el, attrs) {
-          var isValidExp, maskExp, onChange, valueExp;
-          valueExp = $parse(attrs.uiValue);
-          isValidExp = $parse(attrs.uiIsvalid);
-          maskExp = $parse(attrs.uiMask);
-          onChange = function() {
-            var valid;
-            valid = el.isMaskValid();
-            if (valid) {
-              el.addClass('mask-valid').removeClass('mask-invalid');
-            } else {
-              el.addClass('mask-invalid').removeClass('mask-valid');
-            }
-            valueExp.assign($scope, el.mask());
-            isValidExp.assign($scope, valid);
-            return $scope.$digest();
-          };
-          $(el).mask(maskExp($scope));
-          return el.keypress(onChange).keydown(onChange);
-        }
-      };
-    }
-  ]);
-
-  Widgets.directive('uiDate', [
-    '$parse', function($parse) {
-      return {
-        replace: true,
-        template: "<input type='text'></input>",
-        link: function($scope, el, attrs) {
-          var isValidExp, modelExp,
-            _this = this;
-          if (attrs.uiIsvalid != null) isValidExp = $parse(attrs.uiIsvalid);
-          modelExp = $parse(attrs.ngModel);
-          return $(el).datepicker({
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: 'dd/mm/yy',
-            onClose: function(date, picker) {
-              var isDate;
-              modelExp.assign($scope, date);
-              isDate = /\d\d\/\d\d\/\d\d\d\d/.test(date);
-              if (isValidExp != null) isValidExp.assign($scope, isDate);
-              return $scope.$digest();
-            }
+  Widgets.directive('uiMask', function() {
+    return {
+      require: 'ngModel',
+      scope: {
+        uiMask: 'evaluate'
+      },
+      link: function($scope, element, attrs, controller) {
+        $(element).mask($scope.uiMask);
+        controller.$parsers.push(function(value) {
+          var isValid;
+          isValid = $(element).data('mask-isvalid');
+          controller.$setValidity('mask', isValid);
+          return value = isValid ? element.mask() : null;
+        });
+        return $(element).bind('blur', function() {
+          return $scope.$apply(function() {
+            return controller.$setViewValue(element.mask());
           });
-        }
-      };
-    }
-  ]);
+        });
+      }
+    };
+  });
+
+  Widgets.directive('uiDate', function() {
+    return {
+      require: 'ngModel',
+      scope: {
+        uiDate: 'evaluate'
+      },
+      link: function($scope, element, attrs, controller) {
+        var options;
+        options = {
+          onClose: function(date, picker) {
+            return $scope.$apply(function() {
+              return controller.$setViewValue(date);
+            });
+          }
+        };
+        angular.extend(options, $scope.uiDate);
+        console.log(options);
+        return $(element).datepicker(options);
+      }
+    };
+  });
 
 }).call(this);
