@@ -5,7 +5,6 @@
 </div>
 <div class="form-field">
     <label for="dob">Date of Birth:</label>
-    <input ui-date="dateOptions" ng-model="answer.dob" />
+    <div ui-date="dateOptions" ng-model="answer.dob" required />
 </div>
-<pre>{{identityForm | json}}</pre>
 </form>

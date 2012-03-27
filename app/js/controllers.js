@@ -146,7 +146,9 @@
       this.$scope.dateOptions = {
         changeMonth: true,
         changeYear: true,
-        dateFormat: 'dd/mm/yy'
+        dateFormat: 'dd/mm/yy',
+        yearRange: '1900:-0',
+        constrainInput: true
       };
       this.$scope.$watch((function() {
         return "" + _this.$scope.identityForm.$valid;

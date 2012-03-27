@@ -89,6 +89,8 @@ class @Questionnaire.IdentityQuestionController
       changeMonth: true
       changeYear: true
       dateFormat: 'dd/mm/yy'
+      yearRange: '1900:-0'
+      constrainInput: true
 
     # Watch the identity form and update the answer validity accordingly
     @$scope.$watch (()=> "#{@$scope.identityForm.$valid}"), (value)=>

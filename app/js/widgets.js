@@ -11,12 +11,20 @@
         uiMask: 'evaluate'
       },
       link: function($scope, element, attrs, controller) {
-        $(element).mask($scope.uiMask);
+        controller.$render = function() {
+          var _ref;
+          element.val((_ref = controller.$viewValue) != null ? _ref : '');
+          return $(element).mask($scope.uiMask);
+        };
         controller.$parsers.push(function(value) {
           var isValid;
           isValid = $(element).data('mask-isvalid');
           controller.$setValidity('mask', isValid);
-          return value = isValid ? element.mask() : null;
+          if (isValid) {
+            return element.mask();
+          } else {
+            return null;
+          }
         });
         return $(element).bind('blur', function() {
           return $scope.$apply(function() {
@@ -36,15 +44,19 @@
       link: function($scope, element, attrs, controller) {
         var options;
         options = {
-          onClose: function(date, picker) {
+          onSelect: function(date, picker) {
             return $scope.$apply(function() {
+              console.log(date);
               return controller.$setViewValue(date);
             });
           }
         };
         angular.extend(options, $scope.uiDate);
-        console.log(options);
-        return $(element).datepicker(options);
+        return controller.$render = function() {
+          var _ref;
+          element.val((_ref = controller.$viewValue) != null ? _ref : '');
+          return $(element).datepicker(options);
+        };
       }
     };
   });
