@@ -17,7 +17,8 @@ angular.module('AppConfig',[])
     )
 
     $routeProvider.when('/:questionnaire/summary',
-      template: '/templates/questionnaire-summary.html',
+      template: '/templates/questionnaire-summary.html'
+      controller: 'Questionnaire.SubmissionController'
     )
 
     $routeProvider.when('/:questionnaire/:questionIndex',

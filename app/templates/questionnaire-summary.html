@@ -4,13 +4,14 @@
 	<h1>{{questionnaire.title}}</h1>
 </header>
 <h2>Summary</h2>
-<p>Please check your answers and then submit</p>
+<p>Please check your answers and then submit...</p>
 <table class="summary nice">
 	<tbody>
-		<tr ng-repeat="answer in response.answers">
+		<tr ng-repeat="answer in answers">
 			<td class="question">{{$index+1}}. {{answer.question.title}}</td>
 			<td class="answer" ng-bind-html="answer.description"></td>
 			<td><a ng-href="#/{{questionnaireId}}/{{answer.questionIndex}}" class="large button radius">Change</td>
 		</tr>
 	</tbody>
 </table>
+<pre>{{answers | json}}</pre>

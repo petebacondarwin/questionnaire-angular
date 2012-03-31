@@ -13,7 +13,7 @@
       this.QuestionnaireService = QuestionnaireService;
       this.$location = $location;
       this.$log = $log;
-      this.createResponse = __bind(this.createResponse, this);
+      this.createAnswerHolder = __bind(this.createAnswerHolder, this);
       this.updateScopeForQuestionnaire = __bind(this.updateScopeForQuestionnaire, this);
       this.onRouteChanged = __bind(this.onRouteChanged, this);
       this.$scope.$on('$afterRouteChange', this.onRouteChanged);
@@ -34,8 +34,11 @@
     AppController.prototype.updateScopeForQuestionnaire = function(questionnaire) {
       var _ref, _ref2,
         _this = this;
-      this.$scope.questionnaire = questionnaire;
-      this.$scope.numQuestions = questionnaire.questions.length;
+      if (((_ref = this.$scope.questionnaire) != null ? _ref._id : void 0) !== questionnaire._id) {
+        this.$scope.questionnaire = questionnaire;
+        this.$scope.numQuestions = questionnaire.questions.length;
+        this.$scope.answers = this.createAnswerHolder(questionnaire);
+      }
       this.$scope.questionnaireUrl = "" + this.$scope.questionnaireId;
       this.$scope.home = function() {
         return _this.$location.path('/');
@@ -43,15 +46,12 @@
       this.$scope.start = function() {
         return _this.$location.path("" + _this.$scope.questionnaireUrl + "/1");
       };
-      if (((_ref = this.$scope.response) != null ? _ref.questionnaire : void 0) !== this.$scope.questionnaire._id) {
-        this.$scope.response = this.createResponse(questionnaire);
-      }
       if (this.$scope.questionIndex != null) {
         if (!((this.$scope.questionIndex != null) && (1 <= (_ref2 = this.$scope.questionIndex) && _ref2 <= this.$scope.numQuestions))) {
           this.$location.path('/');
         }
         this.$scope.question = questionnaire.questions[this.$scope.questionIndex - 1];
-        this.$scope.answer = this.$scope.response.answers[this.$scope.questionIndex - 1];
+        this.$scope.answer = this.$scope.answers[this.$scope.questionIndex - 1];
         this.$scope.questionTemplate = function(questionType) {
           return "/templates/questions/" + questionType + ".html";
         };
@@ -87,31 +87,24 @@
           return !_this.$scope.isValid();
         };
         return this.$scope.allValid = function() {
-          var _ref3, _ref4;
-          return (_ref3 = _this.$scope.response) != null ? (_ref4 = _ref3.answers) != null ? _ref4.every(function(answer) {
+          var _ref3;
+          return (_ref3 = _this.$scope.answers) != null ? _ref3.every(function(answer) {
             return answer.isValid;
-          }) : void 0 : void 0;
+          }) : void 0;
         };
       }
     };
 
-    AppController.prototype.createResponse = function(questionnaire) {
-      var now, response;
-      this.$log.log("AppController: Creating a new response for questionnaire: " + questionnaire._id);
-      now = new Date();
-      return response = {
-        questionnaire: questionnaire._id,
-        date: now.toDateString(),
-        time: now.getTime(),
-        type: 'response',
-        answers: questionnaire.questions.map(function(question, index) {
-          return {
-            question: question,
-            questionIndex: index + 1,
-            isValid: false
-          };
-        })
-      };
+    AppController.prototype.createAnswerHolder = function(questionnaire) {
+      var answers;
+      this.$log.log("AppController: Creating a new set of answers for questionnaire: " + questionnaire._id);
+      return answers = questionnaire.questions.map(function(question, index) {
+        return {
+          question: question,
+          questionIndex: index + 1,
+          isValid: false
+        };
+      });
     };
 
     return AppController;
@@ -151,7 +144,10 @@
       this.$scope.$watch((function() {
         return "" + _this.$scope.identityForm.$valid;
       }), function(value) {
-        return _this.$scope.answer.isValid = $scope.identityForm.$valid;
+        var answer;
+        answer = _this.$scope.answer;
+        answer.value = hex_md5(answer.nhs + ":" + _this.$scope.niceDate(answer.dob));
+        return answer.isValid = $scope.identityForm.$valid;
       });
       this.$scope.niceDate = function(date) {
         var dateString;
@@ -184,13 +180,31 @@
         }
       };
       this.$scope.selectChoice = function(choice) {
-        _this.$scope.answer.choice = choice;
-        _this.$scope.answer.isValid = choice != null;
-        return _this.$scope.answer.description = choice.title;
+        return angular.extend(_this.$scope.answer, {
+          choice: choice,
+          isValid: choice != null,
+          description: choice.title,
+          value: choice.value
+        });
       };
     }
 
     return ChoiceQuestionController;
+
+  })();
+
+  this.Questionnaire.SubmissionController = (function() {
+
+    SubmissionController.$inject = ['$scope', 'ResponseService', '$location'];
+
+    function SubmissionController($scope, ResponseService, $location) {
+      $scope.submit = function() {
+        ResponseService.submitResponse($scope.questionnaire, $scope.answers);
+        return $location.path(this.$scope.questionnaireUrl + "/complete");
+      };
+    }
+
+    return SubmissionController;
 
   })();
 

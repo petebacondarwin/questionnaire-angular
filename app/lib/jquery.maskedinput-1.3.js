@@ -218,7 +218,6 @@
                 function checkVal(allow) {
                     //try to place characters where they belong
                     var test = input.val();
-                    console.debug(test);
                     var lastMatch = -1;
                     for (var i = 0, pos = 0; i < len; i++) {
                         if (tests[i]) {

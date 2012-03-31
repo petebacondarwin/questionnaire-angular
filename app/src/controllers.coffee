@@ -21,17 +21,15 @@ class @Questionnaire.AppController
 
   updateScopeForQuestionnaire: (questionnaire)=>
     # Ensure that the scope has a reference to the current questionnaire
-    @$scope.questionnaire = questionnaire
-    @$scope.numQuestions = questionnaire.questions.length
+    if @$scope.questionnaire?._id != questionnaire._id
+      @$scope.questionnaire = questionnaire
+      @$scope.numQuestions = questionnaire.questions.length
+      @$scope.answers = @createAnswerHolder(questionnaire)
 
     # General navigation helpers
     @$scope.questionnaireUrl = "#{@$scope.questionnaireId}"
     @$scope.home = ()=> @$location.path('/')
     @$scope.start = ()=> @$location.path("#{@$scope.questionnaireUrl}/1")
-
-    # Create a response if we don't have one already
-    if @$scope.response?.questionnaire isnt @$scope.questionnaire._id
-      @$scope.response = @createResponse(questionnaire)
 
     # Are we on a question?
     if @$scope.questionIndex?
@@ -40,7 +38,7 @@ class @Questionnaire.AppController
       # Ensure that the scope has a reference to the current question
       @$scope.question = questionnaire.questions[@$scope.questionIndex-1] # questionIndex is 1-based
       # Ensure that the scope has a reference to the current answer
-      @$scope.answer = @$scope.response.answers[@$scope.questionIndex-1]
+      @$scope.answer = @$scope.answers[@$scope.questionIndex-1]
 
       @$scope.questionTemplate = (questionType)-> "/templates/questions/#{questionType}.html"
 
@@ -56,21 +54,16 @@ class @Questionnaire.AppController
       # Validity helpers
       @$scope.isValid = ()=> @$scope.answer?.isValid
       @$scope.isInvalid = ()=> not @$scope.isValid()
-      @$scope.allValid = ()=> @$scope.response?.answers?.every (answer)-> answer.isValid
+      @$scope.allValid = ()=> @$scope.answers?.every (answer)-> answer.isValid
 
-  # Build a new response from the supplied questionnaire
-  createResponse: (questionnaire)=>
-    @$log.log "AppController: Creating a new response for questionnaire: #{questionnaire._id}"
-    now = new Date()
-    response =
-      questionnaire: questionnaire._id
-      date: now.toDateString()
-      time: now.getTime()
-      type: 'response'
-      answers: questionnaire.questions.map (question, index)->
-        question: question      # the question being answered
-        questionIndex: index+1  # questionIndex is 1-based
-        isValid: false          # initially all answers are invalid
+  # Build an object to hold answers to the supplied questionnaire
+  createAnswerHolder: (questionnaire)=>
+    @$log.log "AppController: Creating a new set of answers for questionnaire: #{questionnaire._id}"
+    answers = questionnaire.questions.map (question, index)->
+      question: question      # the question being answered
+      questionIndex: index+1  # questionIndex is 1-based
+      isValid: false          # initially all answers are invalid
+
 
 
 # Controls the display of the list of questionnaires
@@ -81,7 +74,7 @@ class @Questionnaire.QuestionnaireListController
       angular.extend(@$scope, list) # Merge list into scope
 
     
-
+# Controls the display of the question that asks for the users identity
 class @Questionnaire.IdentityQuestionController
   @$inject: ['$scope']
   constructor: (@$scope)->
@@ -91,7 +84,9 @@ class @Questionnaire.IdentityQuestionController
 
     # Watch the identity form and update the answer validity accordingly
     @$scope.$watch (()=> "#{@$scope.identityForm.$valid}"), (value)=>
-      @$scope.answer.isValid = $scope.identityForm.$valid
+      answer = @$scope.answer
+      answer.value = hex_md5(answer.nhs + ":" + @$scope.niceDate(answer.dob))
+      answer.isValid = $scope.identityForm.$valid
 
     @$scope.niceDate = (date)=>
       dateString = @$scope.$eval('answer.dob | date : "dd MMM yyyy"')
@@ -112,6 +107,19 @@ class @Questionnaire.ChoiceQuestionController
         'white'
 
     @$scope.selectChoice = (choice)=>
-      @$scope.answer.choice = choice
-      @$scope.answer.isValid = choice?
-      @$scope.answer.description = choice.title
+      angular.extend @$scope.answer, 
+        choice: choice
+        isValid: choice?
+        description: choice.title
+        value: choice.value
+
+# Controls the submission of the response
+class @Questionnaire.SubmissionController
+  @$inject: ['$scope', 'ResponseService', '$location']
+  constructor: ($scope, ResponseService, $location)->
+    $scope.submit = ()->
+      ResponseService.submitResponse($scope.questionnaire, $scope.answers)
+
+      # TODO: clear the questionnaire and answers
+      
+      $location.path(@$scope.questionnaireUrl + "/complete")

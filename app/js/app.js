@@ -13,7 +13,8 @@
         template: '/templates/questionnaire-detail.html'
       });
       $routeProvider.when('/:questionnaire/summary', {
-        template: '/templates/questionnaire-summary.html'
+        template: '/templates/questionnaire-summary.html',
+        controller: 'Questionnaire.SubmissionController'
       });
       return $routeProvider.when('/:questionnaire/:questionIndex', {
         template: '/templates/question.html'
