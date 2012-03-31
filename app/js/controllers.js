@@ -146,9 +146,7 @@
       this.$scope.dateOptions = {
         changeMonth: true,
         changeYear: true,
-        dateFormat: 'dd/mm/yy',
-        yearRange: '1900:-0',
-        constrainInput: true
+        yearRange: '1900:-0'
       };
       this.$scope.$watch((function() {
         return "" + _this.$scope.identityForm.$valid;
@@ -158,7 +156,7 @@
       this.$scope.$watch((function() {
         return "" + _this.$scope.answer.nhs + " : " + _this.$scope.answer.dob;
       }), function(value) {
-        return _this.$scope.answer.description = "" + _this.$scope.answer.nhs + " : " + _this.$scope.answer.dob;
+        return _this.$scope.answer.description = "NHS: " + _this.$scope.answer.nhs + " <br/>DoB: " + _this.$scope.answer.dob;
       });
     }
 

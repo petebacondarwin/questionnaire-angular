@@ -86,11 +86,8 @@ class @Questionnaire.IdentityQuestionController
   @$inject: ['$scope']
   constructor: (@$scope)->
     @$scope.dateOptions =
-      changeMonth: true
-      changeYear: true
-      dateFormat: 'dd/mm/yy'
+      changeMonth: true, changeYear: true
       yearRange: '1900:-0'
-      constrainInput: true
 
     # Watch the identity form and update the answer validity accordingly
     @$scope.$watch (()=> "#{@$scope.identityForm.$valid}"), (value)=>
@@ -98,7 +95,7 @@ class @Questionnaire.IdentityQuestionController
 
     # Watch the identity form and update the answer description accordingly
     @$scope.$watch (()=>"#{@$scope.answer.nhs} : #{@$scope.answer.dob}"), (value)=>
-      @$scope.answer.description = "#{@$scope.answer.nhs} : #{@$scope.answer.dob}"
+      @$scope.answer.description = "NHS: #{@$scope.answer.nhs} <br/>DoB: #{@$scope.answer.dob}"
 
 # Controls the behaviour of a multichoice question
 class @Questionnaire.ChoiceQuestionController

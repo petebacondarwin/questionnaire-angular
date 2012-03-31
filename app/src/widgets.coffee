@@ -11,8 +11,9 @@ Widgets.directive 'uiMask', ()->
   link: ($scope, element, attrs, controller)->
 
     # We override the render method to run the jQuery mask plugin
+    defaultRender = controller.$render
     controller.$render = ()->
-      element.val(controller.$viewValue ? '')
+      defaultRender()
       $(element).mask($scope.uiMask)
 
     # Add a parser that extracts the masked value into the model but only if the mask is valid
@@ -30,22 +31,35 @@ Widgets.directive 'uiMask', ()->
         controller.$setViewValue(element.mask())
 
 
-# Date picker directive
-# Requires jQuery UI Date plugin
 Widgets.directive 'uiDate', ()->
-  require: 'ngModel'
+  require: '?ngModel'
   scope:
     uiDate: 'evaluate'
   link: ($scope, element, attrs, controller)->
-    options = 
-      onSelect: (date, picker)->
+    $scope.uiDate ?= {}
+
+    # If we have a controller (i.e. ngModelController) then wire it up
+    if controller?
+      updateModel = (value, picker)->
         $scope.$apply ()->
-          console.log date
-          controller.$setViewValue(date)
+          controller.$setViewValue(element.datepicker("getDate"))
 
-    # Add in the options from the directive       
-    angular.extend options, $scope.uiDate
+      if $scope.uiDate.onSelect?
+        # Caller has specified onSelect to call this as well as updating the model
+        usersOnSelectHandler = $scope.uiDate.onSelect
+        $scope.uiDate.onSelect = (value, picker)->
+          updateModel(value)
+          usersOnSelectHandler(value, picker)
+      else
+        # No onSelect already specified so just update the model
+        $scope.uiDate.onSelect = updateModel
 
-    controller.$render = ()->
-      element.val(controller.$viewValue ? '')
-      $(element).datepicker options
+      # Update the date picker when the model changes
+      originalRender = controller.$render
+      controller.$render = ()->
+        originalRender()
+        element.datepicker("setDate", controller.$viewValue)
+
+    # Create the datepicker widget
+    element.datepicker($scope.uiDate)
+
