@@ -153,10 +153,14 @@
       }), function(value) {
         return _this.$scope.answer.isValid = $scope.identityForm.$valid;
       });
+      this.$scope.niceDate = function(date) {
+        var dateString;
+        return dateString = _this.$scope.$eval('answer.dob | date : "dd MMM yyyy"');
+      };
       this.$scope.$watch((function() {
         return "" + _this.$scope.answer.nhs + " : " + _this.$scope.answer.dob;
       }), function(value) {
-        return _this.$scope.answer.description = "NHS: " + _this.$scope.answer.nhs + " <br/>DoB: " + _this.$scope.answer.dob;
+        return _this.$scope.answer.description = "NHS: " + _this.$scope.answer.nhs + " <br/>DoB: " + (_this.$scope.niceDate(_this.$scope.answer.dob));
       });
     }
 

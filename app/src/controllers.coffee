@@ -93,9 +93,12 @@ class @Questionnaire.IdentityQuestionController
     @$scope.$watch (()=> "#{@$scope.identityForm.$valid}"), (value)=>
       @$scope.answer.isValid = $scope.identityForm.$valid
 
+    @$scope.niceDate = (date)=>
+      dateString = @$scope.$eval('answer.dob | date : "dd MMM yyyy"')
+
     # Watch the identity form and update the answer description accordingly
     @$scope.$watch (()=>"#{@$scope.answer.nhs} : #{@$scope.answer.dob}"), (value)=>
-      @$scope.answer.description = "NHS: #{@$scope.answer.nhs} <br/>DoB: #{@$scope.answer.dob}"
+      @$scope.answer.description = "NHS: #{@$scope.answer.nhs} <br/>DoB: #{@$scope.niceDate(@$scope.answer.dob)}"
 
 # Controls the behaviour of a multichoice question
 class @Questionnaire.ChoiceQuestionController
