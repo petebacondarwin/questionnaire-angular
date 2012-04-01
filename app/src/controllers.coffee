@@ -40,7 +40,7 @@ class @Questionnaire.AppController
       # Ensure that the scope has a reference to the current answer
       @$scope.answer = @$scope.answers[@$scope.questionIndex-1]
 
-      @$scope.questionTemplate = (questionType)-> "/templates/questions/#{questionType}.html"
+      @$scope.questionTemplate = (questionType)-> "templates/questions/#{questionType}.html"
 
       # Question specific navigation helpers
       @$scope.notFirst = ()=> @$scope.questionIndex > 1
@@ -70,10 +70,9 @@ class @Questionnaire.AppController
 class @Questionnaire.QuestionnaireListController
   @$inject: ['$scope', 'QuestionnaireService', '$log']
   constructor: (@$scope, @QuestionnaireService, @$log)->
-    @QuestionnaireService.list().success (list)=>
-      angular.extend(@$scope, list) # Merge list into scope
-
-    
+    @QuestionnaireService.list().then (questionnaires)=>
+      @$scope.questionnaires = questionnaires
+   
 # Controls the display of the question that asks for the users identity
 class @Questionnaire.IdentityQuestionController
   @$inject: ['$scope']
@@ -115,8 +114,8 @@ class @Questionnaire.ChoiceQuestionController
 
 # Controls the submission of the response
 class @Questionnaire.SubmissionController
-  @$inject: ['$scope', 'ResponseService', '$location']
-  constructor: ($scope, ResponseService, $location)->
+  @$inject: ['$scope', '$location', 'ResponseService']
+  constructor: ($scope, $location, ResponseService)->
     $scope.submit = ()->
       ResponseService.submitResponse($scope.questionnaire, $scope.answers)
 

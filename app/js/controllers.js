@@ -53,7 +53,7 @@
         this.$scope.question = questionnaire.questions[this.$scope.questionIndex - 1];
         this.$scope.answer = this.$scope.answers[this.$scope.questionIndex - 1];
         this.$scope.questionTemplate = function(questionType) {
-          return "/templates/questions/" + questionType + ".html";
+          return "templates/questions/" + questionType + ".html";
         };
         this.$scope.notFirst = function() {
           return _this.$scope.questionIndex > 1;
@@ -120,8 +120,8 @@
       this.$scope = $scope;
       this.QuestionnaireService = QuestionnaireService;
       this.$log = $log;
-      this.QuestionnaireService.list().success(function(list) {
-        return angular.extend(_this.$scope, list);
+      this.QuestionnaireService.list().then(function(questionnaires) {
+        return _this.$scope.questionnaires = questionnaires;
       });
     }
 
@@ -195,9 +195,9 @@
 
   this.Questionnaire.SubmissionController = (function() {
 
-    SubmissionController.$inject = ['$scope', 'ResponseService', '$location'];
+    SubmissionController.$inject = ['$scope', '$location', 'ResponseService'];
 
-    function SubmissionController($scope, ResponseService, $location) {
+    function SubmissionController($scope, $location, ResponseService) {
       $scope.submit = function() {
         ResponseService.submitResponse($scope.questionnaire, $scope.answers);
         return $location.path(this.$scope.questionnaireUrl + "/complete");

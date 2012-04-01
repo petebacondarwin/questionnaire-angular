@@ -1,0 +1,13 @@
+{
+    "name": "questionnaire",
+    "version": "0.0.1",
+    "description": "An online/offline questionnaire application",
+    "attachments": ["js", "css", "lib", "templates", "index.html", "data"],
+    "dependencies": {
+        "attachments": null,
+        "properties": null,
+        "modules": null
+    },
+    "modules": [ "db" ],
+    "load": "db/app"
+}

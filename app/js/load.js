@@ -1,32 +1,34 @@
 (function() {
   "use strict";
   head.js({
-    jquery: "/lib/jquery.min.js"
+    jquery: "lib/jquery.min.js"
   }, {
-    md5: "/lib/md5.min.js"
+    md5: "lib/md5.min.js"
   }, {
-    uuid: "/lib/uuid.js"
+    uuid: "lib/uuid.js"
   }, {
-    maskedinput: "/lib/jquery.maskedinput-1.3.js"
+    maskedinput: "lib/jquery.maskedinput-1.3.js"
   }, {
-    jqueryUI: "/lib/jquery.ui/jquery-ui-1.8.18.min.js"
+    jqueryUI: "lib/jquery.ui/jquery-ui-1.8.18.min.js"
   }, {
-    angular: "/lib/angular/angular.js"
+    couch: "lib/couch.js"
   }, {
-    controllers: "/js/controllers.js"
+    angular: "lib/angular/angular.js"
   }, {
-    questionnaires: "/js/questionnaires.js"
+    controllers: "js/controllers.js"
   }, {
-    responses: "/js/responses.js"
+    questionnaires: "js/questionnaires.js"
   }, {
-    widgets: "/js/widgets.js"
+    responses: "js/responses.js"
   }, {
-    application: "/js/app.js"
+    widgets: "js/widgets.js"
+  }, {
+    application: "js/app.js"
   });
 
   head.ready("application", function() {
     var module;
-    return module = angular.module('QuestionnaireApp', ['AppConfig', 'QuestionnaireModule', 'ResponseModule', 'WidgetModule']);
+    return module = angular.module('QuestionnaireApp', ['AppConfig', 'ServicesModule', 'WidgetModule']);
   });
 
 }).call(this);
