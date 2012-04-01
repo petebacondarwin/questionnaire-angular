@@ -3,6 +3,7 @@
   "type": "questionnaire",
   "title": "Oxford Shoulder Instability Score",
   "description": "Problems with your shoulder...",
+  "sortOrder": 2,
   "questions":
   [
     {
