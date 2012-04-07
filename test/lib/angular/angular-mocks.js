@@ -1,6 +1,6 @@
 
 /**
- * @license AngularJS v"NG_VERSION_FULL"
+ * @license AngularJS v1.0.0rc4
  * (c) 2010-2011 AngularJS http://angularjs.org
  * License: MIT
  *
@@ -249,8 +249,12 @@ angular.mock.$ExceptionHandlerProvider = function() {
       case 'log':
         var errors = [];
         handler = function(e) {
-          errors.push(e);
-        };
+          if (arguments.length == 1) {
+            errors.push(e);
+          } else {
+            errors.push([].slice.call(arguments, 0));
+          }
+        }
         handler.errors = errors;
         break;
       default:
@@ -369,146 +373,202 @@ angular.mock.$LogProvider = function() {
 };
 
 
-/**
- * @ngdoc object
- * @name angular.mock.TzDate
- * @description
- *
- * *NOTE*: this is not an injectable instance, just a globally available mock class of `Date`.
- *
- * Mock of the Date type which has its timezone specified via constroctor arg.
- *
- * The main purpose is to create Date-like instances with timezone fixed to the specified timezone
- * offset, so that we can test code that depends on local timezone settings without dependency on
- * the time zone settings of the machine where the code is running.
- *
- * @param {number} offset Offset of the *desired* timezone in hours (fractions will be honored)
- * @param {(number|string)} timestamp Timestamp representing the desired time in *UTC*
- *
- * @example
- * !!!! WARNING !!!!!
- * This is not a complete Date object so only methods that were implemented can be called safely.
- * To make matters worse, TzDate instances inherit stuff from Date via a prototype.
- *
- * We do our best to intercept calls to "unimplemented" methods, but since the list of methods is
- * incomplete we might be missing some non-standard methods. This can result in errors like:
- * "Date.prototype.foo called on incompatible Object".
- *
- * <pre>
- * var newYearInBratislava = new TzDate(-1, '2009-12-31T23:00:00Z');
- * newYearInBratislava.getTimezoneOffset() => -60;
- * newYearInBratislava.getFullYear() => 2010;
- * newYearInBratislava.getMonth() => 0;
- * newYearInBratislava.getDate() => 1;
- * newYearInBratislava.getHours() => 0;
- * newYearInBratislava.getMinutes() => 0;
- * </pre>
- *
- */
-angular.mock.TzDate = function (offset, timestamp) {
-  var self = new Date(0);
-  if (angular.isString(timestamp)) {
-    var tsStr = timestamp;
+(function() {
+  var R_ISO8061_STR = /^(\d{4})-?(\d\d)-?(\d\d)(?:T(\d\d)(?:\:?(\d\d)(?:\:?(\d\d)(?:\.(\d{3}))?)?)?(Z|([+-])(\d\d):?(\d\d)))?$/;
 
-    self.origDate = angular.fromJson(angular.toJson({date:timestamp})).date;
-
-    timestamp = self.origDate.getTime();
-    if (isNaN(timestamp))
-      throw {
-        name: "Illegal Argument",
-        message: "Arg '" + tsStr + "' passed into TzDate constructor is not a valid date string"
-      };
-  } else {
-    self.origDate = new Date(timestamp);
+  function jsonStringToDate(string){
+    var match;
+    if (match = string.match(R_ISO8061_STR)) {
+      var date = new Date(0),
+          tzHour = 0,
+          tzMin  = 0;
+      if (match[9]) {
+        tzHour = int(match[9] + match[10]);
+        tzMin = int(match[9] + match[11]);
+      }
+      date.setUTCFullYear(int(match[1]), int(match[2]) - 1, int(match[3]));
+      date.setUTCHours(int(match[4]||0) - tzHour, int(match[5]||0) - tzMin, int(match[6]||0), int(match[7]||0));
+      return date;
+    }
+    return string;
   }
 
-  var localOffset = new Date(timestamp).getTimezoneOffset();
-  self.offsetDiff = localOffset*60*1000 - offset*1000*60*60;
-  self.date = new Date(timestamp + self.offsetDiff);
+  function int(str) {
+    return parseInt(str, 10);
+  }
 
-  self.getTime = function() {
-    return self.date.getTime() - self.offsetDiff;
-  };
+  function padNumber(num, digits, trim) {
+    var neg = '';
+    if (num < 0) {
+      neg =  '-';
+      num = -num;
+    }
+    num = '' + num;
+    while(num.length < digits) num = '0' + num;
+    if (trim)
+      num = num.substr(num.length - digits);
+    return neg + num;
+  }
 
-  self.toLocaleDateString = function() {
-    return self.date.toLocaleDateString();
-  };
 
-  self.getFullYear = function() {
-    return self.date.getFullYear();
-  };
+  /**
+   * @ngdoc object
+   * @name angular.mock.TzDate
+   * @description
+   *
+   * *NOTE*: this is not an injectable instance, just a globally available mock class of `Date`.
+   *
+   * Mock of the Date type which has its timezone specified via constroctor arg.
+   *
+   * The main purpose is to create Date-like instances with timezone fixed to the specified timezone
+   * offset, so that we can test code that depends on local timezone settings without dependency on
+   * the time zone settings of the machine where the code is running.
+   *
+   * @param {number} offset Offset of the *desired* timezone in hours (fractions will be honored)
+   * @param {(number|string)} timestamp Timestamp representing the desired time in *UTC*
+   *
+   * @example
+   * !!!! WARNING !!!!!
+   * This is not a complete Date object so only methods that were implemented can be called safely.
+   * To make matters worse, TzDate instances inherit stuff from Date via a prototype.
+   *
+   * We do our best to intercept calls to "unimplemented" methods, but since the list of methods is
+   * incomplete we might be missing some non-standard methods. This can result in errors like:
+   * "Date.prototype.foo called on incompatible Object".
+   *
+   * <pre>
+   * var newYearInBratislava = new TzDate(-1, '2009-12-31T23:00:00Z');
+   * newYearInBratislava.getTimezoneOffset() => -60;
+   * newYearInBratislava.getFullYear() => 2010;
+   * newYearInBratislava.getMonth() => 0;
+   * newYearInBratislava.getDate() => 1;
+   * newYearInBratislava.getHours() => 0;
+   * newYearInBratislava.getMinutes() => 0;
+   * </pre>
+   *
+   */
+  angular.mock.TzDate = function (offset, timestamp) {
+    var self = new Date(0);
+    if (angular.isString(timestamp)) {
+      var tsStr = timestamp;
 
-  self.getMonth = function() {
-    return self.date.getMonth();
-  };
+      self.origDate = jsonStringToDate(timestamp)
 
-  self.getDate = function() {
-    return self.date.getDate();
-  };
+      timestamp = self.origDate.getTime();
+      if (isNaN(timestamp))
+        throw {
+          name: "Illegal Argument",
+          message: "Arg '" + tsStr + "' passed into TzDate constructor is not a valid date string"
+        };
+    } else {
+      self.origDate = new Date(timestamp);
+    }
 
-  self.getHours = function() {
-    return self.date.getHours();
-  };
+    var localOffset = new Date(timestamp).getTimezoneOffset();
+    self.offsetDiff = localOffset*60*1000 - offset*1000*60*60;
+    self.date = new Date(timestamp + self.offsetDiff);
 
-  self.getMinutes = function() {
-    return self.date.getMinutes();
-  };
-
-  self.getSeconds = function() {
-    return self.date.getSeconds();
-  };
-
-  self.getTimezoneOffset = function() {
-    return offset * 60;
-  };
-
-  self.getUTCFullYear = function() {
-    return self.origDate.getUTCFullYear();
-  };
-
-  self.getUTCMonth = function() {
-    return self.origDate.getUTCMonth();
-  };
-
-  self.getUTCDate = function() {
-    return self.origDate.getUTCDate();
-  };
-
-  self.getUTCHours = function() {
-    return self.origDate.getUTCHours();
-  };
-
-  self.getUTCMinutes = function() {
-    return self.origDate.getUTCMinutes();
-  };
-
-  self.getUTCSeconds = function() {
-    return self.origDate.getUTCSeconds();
-  };
-
-  self.getDay = function() {
-    return self.origDate.getDay();
-  };
-
-  //hide all methods not implemented in this mock that the Date prototype exposes
-  var unimplementedMethods = ['getMilliseconds', 'getUTCDay',
-      'getUTCMilliseconds', 'getYear', 'setDate', 'setFullYear', 'setHours', 'setMilliseconds',
-      'setMinutes', 'setMonth', 'setSeconds', 'setTime', 'setUTCDate', 'setUTCFullYear',
-      'setUTCHours', 'setUTCMilliseconds', 'setUTCMinutes', 'setUTCMonth', 'setUTCSeconds',
-      'setYear', 'toDateString', 'toJSON', 'toGMTString', 'toLocaleFormat', 'toLocaleString',
-      'toLocaleTimeString', 'toSource', 'toString', 'toTimeString', 'toUTCString', 'valueOf'];
-
-  angular.forEach(unimplementedMethods, function(methodName) {
-    self[methodName] = function() {
-      throw Error("Method '" + methodName + "' is not implemented in the TzDate mock");
+    self.getTime = function() {
+      return self.date.getTime() - self.offsetDiff;
     };
-  });
 
-  return self;
-};
+    self.toLocaleDateString = function() {
+      return self.date.toLocaleDateString();
+    };
 
-//make "tzDateInstance instanceof Date" return true
-angular.mock.TzDate.prototype = Date.prototype;
+    self.getFullYear = function() {
+      return self.date.getFullYear();
+    };
+
+    self.getMonth = function() {
+      return self.date.getMonth();
+    };
+
+    self.getDate = function() {
+      return self.date.getDate();
+    };
+
+    self.getHours = function() {
+      return self.date.getHours();
+    };
+
+    self.getMinutes = function() {
+      return self.date.getMinutes();
+    };
+
+    self.getSeconds = function() {
+      return self.date.getSeconds();
+    };
+
+    self.getTimezoneOffset = function() {
+      return offset * 60;
+    };
+
+    self.getUTCFullYear = function() {
+      return self.origDate.getUTCFullYear();
+    };
+
+    self.getUTCMonth = function() {
+      return self.origDate.getUTCMonth();
+    };
+
+    self.getUTCDate = function() {
+      return self.origDate.getUTCDate();
+    };
+
+    self.getUTCHours = function() {
+      return self.origDate.getUTCHours();
+    };
+
+    self.getUTCMinutes = function() {
+      return self.origDate.getUTCMinutes();
+    };
+
+    self.getUTCSeconds = function() {
+      return self.origDate.getUTCSeconds();
+    };
+
+    self.getUTCMilliseconds = function() {
+      return self.origDate.getUTCMilliseconds();
+    };
+
+    self.getDay = function() {
+      return self.date.getDay();
+    };
+
+    // provide this method only on browsers that already have it
+    if (self.toISOString) {
+      self.toISOString = function() {
+        return padNumber(self.origDate.getUTCFullYear(), 4) + '-' +
+              padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
+              padNumber(self.origDate.getUTCDate(), 2) + 'T' +
+              padNumber(self.origDate.getUTCHours(), 2) + ':' +
+              padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
+              padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
+              padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
+      }
+    }
+
+    //hide all methods not implemented in this mock that the Date prototype exposes
+    var unimplementedMethods = ['getMilliseconds', 'getUTCDay',
+        'getYear', 'setDate', 'setFullYear', 'setHours', 'setMilliseconds',
+        'setMinutes', 'setMonth', 'setSeconds', 'setTime', 'setUTCDate', 'setUTCFullYear',
+        'setUTCHours', 'setUTCMilliseconds', 'setUTCMinutes', 'setUTCMonth', 'setUTCSeconds',
+        'setYear', 'toDateString', 'toGMTString', 'toJSON', 'toLocaleFormat', 'toLocaleString',
+        'toLocaleTimeString', 'toSource', 'toString', 'toTimeString', 'toUTCString', 'valueOf'];
+
+    angular.forEach(unimplementedMethods, function(methodName) {
+      self[methodName] = function() {
+        throw Error("Method '" + methodName + "' is not implemented in the TzDate mock");
+      };
+    });
+
+    return self;
+  };
+
+  //make "tzDateInstance instanceof Date" return true
+  angular.mock.TzDate.prototype = Date.prototype;
+})();
 
 
 /**
@@ -680,19 +740,17 @@ angular.mock.dump = function(object) {
  *
  * <pre>
    // controller
-   function MyController($http) {
-     var scope = this;
-
+   function MyController($scope, $http) {
      $http.get('/auth.py').success(function(data) {
-       scope.user = data;
+       $scope.user = data;
      });
 
      this.saveMessage = function(message) {
-       scope.status = 'Saving...';
+       $scope.status = 'Saving...';
        $http.post('/add-msg.py', message).success(function(response) {
-         scope.status = '';
+         $scope.status = '';
        }).error(function() {
-         scope.status = 'ERROR!';
+         $scope.status = 'ERROR!';
        });
      };
    }
@@ -1269,7 +1327,7 @@ function MockXhr() {
  * The `ngMock` is an angular module which is used with `ng` module and adds unit-test configuration as well as useful
  * mocks to the {@link angular.module.AUTO.$injector $injector}.
  */
-angular.module('ngMock', ['ng']).service({
+angular.module('ngMock', ['ng']).provider({
   $browser: angular.mock.$BrowserProvider,
   $exceptionHandler: angular.mock.$ExceptionHandlerProvider,
   $log: angular.mock.$LogProvider,
@@ -1456,6 +1514,9 @@ window.jstestdriver && (function(window) {
       args.push(angular.mock.dump(arg));
     });
     jstestdriver.console.log.apply(jstestdriver.console, args);
+    if (window.console) {
+      window.console.log.apply(window.console, args);
+    }
   };
 })(window);
 
@@ -1523,35 +1584,36 @@ window.jasmine && (function(window) {
    * Example of what a typical jasmine tests looks like with the inject method.
    * <pre>
    *
-   *   angular.module('myTestsModule', [], function($provide) {
-   *     $provide.value('mode', 'test');
-   *   });
+   *   angular.module('myApplicationModule', [])
+   *       .value('mode', 'app')
+   *       .value('version', 'v1.0.1');
+   *
    *
    *   describe('MyApp', function() {
    *
-   *     // you can list multiple module function or aliases
-   *     // which will be used in creating the injector
-   *     beforeEach(module('myTestModule', function($provide) {
-   *       // $provide service is configured as needed
-   *       $provide.value('version', 'v1.0.1');
-   *     });
+   *     // You need to load modules that you want to test,
+   *     // it loads only the "ng" module by default.
+   *     beforeEach(module('myApplicationModule'));
    *
-   *     // The inject() is used to get references.
+   *
+   *     // inject() is used to inject arguments of all given functions
    *     it('should provide a version', inject(function(mode, version) {
    *       expect(version).toEqual('v1.0.1');
-   *       expect(mode).toEqual('test');
-   *     });
+   *       expect(mode).toEqual('app');
+   *     }));
+   *
    *
    *     // The inject and module method can also be used inside of the it or beforeEach
-   *     it('should override a version and test the new version is injected', function(){
+   *     it('should override a version and test the new version is injected', function() {
+   *       // module() takes functions or strings (module aliases)
    *       module(function($provide) {
    *         $provide.value('version', 'overridden'); // override version here
    *       });
+   *
    *       inject(function(version) {
    *         expect(version).toEqual('overridden');
    *       });
    *     ));
-   *
    *   });
    *
    * </pre>
