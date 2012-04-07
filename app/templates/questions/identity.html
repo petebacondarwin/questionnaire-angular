@@ -5,7 +5,7 @@
 </div>
 <div class="form-field">
     <label for="dob">Date of Birth:</label>
-    <input readonly id="dob" placeholder="Please select a date" required value="{{niceDate(answer.dob)}}">
-    <div ui-date="dateOptions" ng-model="answer.dob" name="dob" required />
+    <input readonly id="dob" placeholder="Please select a date" value="{{niceDate(answer.dob)}}">
+    <div ui-date="dateOptions" ng-model="answer.dob" name="dob" required="true" />
 </div>
 </form>
