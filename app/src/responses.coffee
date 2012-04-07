@@ -5,7 +5,7 @@ angular.module('ServicesModule').service "ResponseService",
     buildResponse = (questionnaire, answers)->
       now = new Date()
       response =
-        _id: "response_#{questionnaire._id}_#{uuid.v1()}"
+        _id: "response_#{questionnaire._id}_#{uuid.v4()}"
         date: now.toDateString()
         time: now.toTimeString()
         type: 'response'

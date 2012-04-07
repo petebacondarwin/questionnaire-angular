@@ -18,5 +18,5 @@ head.js(
 
 head.ready( "application", ->
   # Declare app-level module which depends on filters, and services
-  module = angular.module( 'QuestionnaireApp', ['AppConfig', 'ServicesModule', 'WidgetModule'] )
+  module = angular.module( 'QuestionnaireApp', ['AppConfig', 'Controllers', 'ServicesModule', 'WidgetModule'] )
 )

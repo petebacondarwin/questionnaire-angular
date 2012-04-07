@@ -7,7 +7,7 @@
         var now, response;
         now = new Date();
         return response = {
-          _id: "response_" + questionnaire._id + "_" + (uuid.v1()),
+          _id: "response_" + questionnaire._id + "_" + (uuid.v4()),
           date: now.toDateString(),
           time: now.toTimeString(),
           type: 'response',

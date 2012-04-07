@@ -1,15 +1,19 @@
 // Rewrite settings to be exported from the design doc
 module.exports = [
   {
-     "from":"/db/responses",
-     "to":"_list/responses/responses"
+    "from":"/",
+    "to":"index.html"
   },
   {
-     "from":"/db/questionnaires",
+     "from":"/responses",
+     "to":"_view/responses"
+  },
+  {
+     "from":"/questionnaires",
      "to":"_view/questionnaires"
   },
   {
-    "from": "/db/questionnaire/*",
+    "from": "/questionnaire/*",
     "to": "../../*"
   },
   { // keeping relative urls sane

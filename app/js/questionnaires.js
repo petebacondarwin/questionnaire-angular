@@ -8,7 +8,7 @@
       }
       this.list = function() {
         var _this = this;
-        return typeof questionnaireListPromise !== "undefined" && questionnaireListPromise !== null ? questionnaireListPromise : questionnaireListPromise = $http.get('db/questionnaires').then(function(response) {
+        return typeof questionnaireListPromise !== "undefined" && questionnaireListPromise !== null ? questionnaireListPromise : questionnaireListPromise = $http.get('questionnaires').then(function(response) {
           return response.data.rows.map(function(row) {
             return {
               name: row.id,
@@ -36,7 +36,7 @@
       return this.getQuestionnaire = function(id) {
         var _ref;
         if (id === '') return $q.reject('Empty questionnaire id');
-        return (_ref = questionnairePromises[id]) != null ? _ref : questionnairePromises[id] = $http.get("db/questionnaire/" + id).then(function(response) {
+        return (_ref = questionnairePromises[id]) != null ? _ref : questionnairePromises[id] = $http.get("questionnaire/" + id).then(function(response) {
           return response.data;
         });
       };

@@ -9,7 +9,7 @@ angular.module('AppConfig',[])
 
     $routeProvider.when('/',
       template: 'templates/questionnaire-list.html'
-      controller: 'Questionnaire.QuestionnaireListController'
+      controller: 'QuestionnaireListController'
     )
 
     $routeProvider.when('/:questionnaire',
@@ -18,7 +18,12 @@ angular.module('AppConfig',[])
 
     $routeProvider.when('/:questionnaire/summary',
       template: 'templates/questionnaire-summary.html'
-      controller: 'Questionnaire.SubmissionController'
+      controller: 'SubmissionController'
+    )
+
+    $routeProvider.when('/:questionnaire/complete',
+      template: 'templates/questionnaire-complete.html'
+
     )
 
     $routeProvider.when('/:questionnaire/:questionIndex',

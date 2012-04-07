@@ -7,7 +7,7 @@ angular.module('ServicesModule',[]).service "QuestionnaireService",
       # Get the promise of a list of questionnaires
       this.list = ()->
         questionnaireListPromise ?=
-          $http.get('db/questionnaires')
+          $http.get('questionnaires')
             .then (response) => response.data.rows.map (row)->
               name: row.id
               title: row.value.title
@@ -31,6 +31,6 @@ angular.module('ServicesModule',[]).service "QuestionnaireService",
         if id is ''
           return $q.reject('Empty questionnaire id')
         questionnairePromises[id] ?= 
-            $http.get("db/questionnaire/#{id}")
+            $http.get("questionnaire/#{id}")
               .then (response)=> response.data
     ]
