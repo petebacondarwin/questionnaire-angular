@@ -26,9 +26,4 @@
     application: "js/app.js"
   });
 
-  head.ready("application", function() {
-    var module;
-    return module = angular.module('QuestionnaireApp', ['AppConfig', 'Controllers', 'ServicesModule', 'WidgetModule']);
-  });
-
 }).call(this);

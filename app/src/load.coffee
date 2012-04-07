@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 head.js(
   # load files in parallel but execute them in sequence
@@ -14,9 +14,4 @@ head.js(
   { responses     : "js/responses.js" }
   { widgets       : "js/widgets.js" }
   { application   : "js/app.js" }
-)
-
-head.ready( "application", ->
-  # Declare app-level module which depends on filters, and services
-  module = angular.module( 'QuestionnaireApp', ['AppConfig', 'Controllers', 'ServicesModule', 'WidgetModule'] )
 )

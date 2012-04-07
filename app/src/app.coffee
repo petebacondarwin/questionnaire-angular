@@ -1,6 +1,7 @@
 'use strict'
 
-angular.module('AppConfig',[])
+# Declare app-level module which depends on filters, and services
+angular.module( 'QuestionnaireApp', ['Controllers', 'ServicesModule', 'WidgetModule'] )
   .config(['$routeProvider', ($routeProvider)->
 
     $routeProvider.when('/:questionnaire/0',
@@ -30,3 +31,4 @@ angular.module('AppConfig',[])
       template: 'templates/question.html'
     )
   ])
+

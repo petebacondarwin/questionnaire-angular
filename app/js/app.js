@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  angular.module('AppConfig', []).config([
+  angular.module('QuestionnaireApp', ['Controllers', 'ServicesModule', 'WidgetModule']).config([
     '$routeProvider', function($routeProvider) {
       $routeProvider.when('/:questionnaire/0', {
         redirectTo: '/:questionnaire'
