@@ -27,7 +27,7 @@ Push the app to the couchdb:
 
 Upload some initial data to the couchdb
 
-```$ kanso upload data/questionnaires/questionnaire```
+```$ kanso upload data/questionnaires/ questionnaire```
 
 Access the application in a browser at:
 
